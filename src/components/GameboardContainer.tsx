@@ -1,7 +1,13 @@
 import { Gameboard } from './Gameboard';
 import styles from '../styles/GameboardContainer.module.css';
-import { Button } from '@chakra-ui/react';
-import { MouseEventHandler, useContext, useEffect, useState } from 'react';
+import { Button, Text, background, useDisclosure } from '@chakra-ui/react';
+import {
+  MouseEventHandler,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { GameContext } from '@/contexts/GameContextProvider';
 import { RenderBuyNFTSection } from './BuyNFTSection';
@@ -9,12 +15,18 @@ import { useWalletSelector } from '@/contexts/WalletSelectorContext';
 import { NFT, NFTCheddarContract } from '@/contracts/nftCheddarContract';
 import { useGetCheddarNFTs } from '@/hooks/cheddar';
 import { ModalContainer } from './FeedbackModal';
+import { RenderCheddarIcon } from './RenderCheddarIcon';
+import { IsAllowedResponse } from '@/hooks/maze';
+import { RenderIsAllowedErrors } from './RenderIsAllowedErrors';
 
 interface Props {
   remainingMinutes: number;
   remainingSeconds: number;
   handlePowerUpClick: MouseEventHandler<HTMLButtonElement>;
   cellSize: number;
+  haveEnoughBalance: boolean | null;
+  minCheddarRequired: number;
+  isAllowedResponse: IsAllowedResponse | null | undefined;
 }
 
 export function GameboardContainer({
@@ -22,6 +34,9 @@ export function GameboardContainer({
   remainingSeconds,
   handlePowerUpClick,
   cellSize,
+  haveEnoughBalance,
+  minCheddarRequired,
+  isAllowedResponse,
 }: Props) {
   const {
     mazeData,
@@ -31,11 +46,14 @@ export function GameboardContainer({
     selectedColorSet,
     hasPowerUp,
     isPowerUpOn,
+    remainingTime,
     handleKeyPress,
     handleTouchMove,
     restartGame,
+    timerStarted,
   } = useContext(GameContext);
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [showBuyNFTPanel, setShowBuyNFTPanel] = useState(false);
   const [showRules, setShowRules] = useState(false);
 
@@ -52,6 +70,17 @@ export function GameboardContainer({
   const { data: cheddarNFTsData, isLoading: isLoadingCheddarNFTs } =
     useGetCheddarNFTs();
   const { modal, selector, accountId } = useWalletSelector();
+
+  const userIsNotAllowedToPlay = useMemo(() => {
+    return accountId && !isAllowedResponse?.ok;
+  }, [accountId, isAllowedResponse?.ok]);
+
+  function getProperHandler(handler: any) {
+    if (isAllowedResponse?.ok) {
+      return handler;
+    }
+    return onOpen;
+  }
 
   useEffect(() => {
     if (!selector.isSignedIn()) {
@@ -76,6 +105,10 @@ export function GameboardContainer({
     selector.wallet().then((wallet) => wallet.signOut());
   }
 
+  function getStartGameButtonHandler() {
+    return accountId ? getProperHandler(restartGame) : modal.show;
+  }
+
   return (
     <div
       className={getGameContainerClasses()}
@@ -83,6 +116,12 @@ export function GameboardContainer({
         maxWidth: `${mazeData[0].length * cellSize + 25}px`,
       }}
     >
+      {accountId && !haveEnoughBalance && (
+        <Text color="tomato">
+          You have to hold at least {minCheddarRequired}
+          {RenderCheddarIcon({ width: '2rem' })} to earn.
+        </Text>
+      )}
       {selector.isSignedIn() ? (
         <div>
           <Button onClick={logOut}>Log out</Button>
@@ -100,57 +139,71 @@ export function GameboardContainer({
         </div>
       </div>
       <div className={styles.gameOver}>{gameOverMessage}</div>
-      {gameOverFlag && (
-        <button onClick={restartGame} className={styles.restartGameButton}>
-          Restart Game
-        </button>
-      )}
-
-      <div
-        className={styles.mazeContainer}
-        tabIndex={0}
-        onKeyDown={handleKeyPress}
-        onTouchMove={handleTouchMove}
-      >
-        <div className={styles.toolbar}>
-          <span className={styles.rulesButton}>
-            <Button onClick={toggleShowRules}>Rules</Button>
-          </span>
-          <div className={styles.tooltip}>
-            <Button
-              colorScheme="yellow"
-              onClick={handlePowerUpClick}
-              disabled={!hasPowerUp}
-            >
-              ⚡
-            </Button>
-            <span className={styles.tooltipText}>
-              Cheddy PowerUp NFT provides in-game features
+      {
+        <div
+          className={styles.mazeContainer}
+          tabIndex={0}
+          onKeyDown={getProperHandler(handleKeyPress)}
+          onTouchMove={getProperHandler(handleTouchMove)}
+        >
+          <div className={styles.toolbar}>
+            <span className={styles.rulesButton}>
+              <Button onClick={toggleShowRules}>Rules</Button>
             </span>
-            {!hasPowerUp && (
-              <span className={styles.buyPowerUp}>
-                <Button
-                  colorScheme="purple"
-                  onClick={handleBuyClick}
-                  disabled={!hasPowerUp}
-                >
-                  Buy
+            {!timerStarted && (
+              <span className={styles.rulesButton}>
+                {/* <Button onClick={getProperHandler(restartGame)}> */}
+                <Button onClick={getStartGameButtonHandler()}>
+                  {gameOverFlag ? 'Restart Game' : 'Start Game'}
                 </Button>
-                {showBuyNFTPanel && (
-                  <div className={styles.popup}>
-                    <RenderBuyNFTSection />
-                  </div>
-                )}
               </span>
             )}
+            <div className={styles.tooltip}>
+              <Button
+                colorScheme="yellow"
+                onClick={handlePowerUpClick}
+                disabled={!hasPowerUp}
+              >
+                ⚡
+              </Button>
+              <span className={styles.tooltipText}>
+                Cheddy PowerUp NFT provides in-game features
+              </span>
+              {!hasPowerUp && (
+                <span className={styles.buyPowerUp}>
+                  <Button
+                    colorScheme="purple"
+                    onClick={handleBuyClick}
+                    disabled={!hasPowerUp}
+                  >
+                    Buy
+                  </Button>
+                  {showBuyNFTPanel && (
+                    <div className={styles.popup}>
+                      <RenderBuyNFTSection />
+                    </div>
+                  )}
+                </span>
+              )}
+            </div>
           </div>
+          <Gameboard
+            showRules={showRules}
+            openLogIn={modal.show}
+            isUserLoggedIn={selector.isSignedIn()}
+            isAllowedResponse={isAllowedResponse!}
+          />
         </div>
-        <Gameboard
-          showRules={showRules}
-          openLogIn={modal.show}
-          isUserLoggedIn={selector.isSignedIn()}
-        />
-      </div>
+      }
+      {userIsNotAllowedToPlay && isAllowedResponse?.errors && (
+        <ModalContainer
+          title={'Ups! You cannot play'}
+          isOpen={isOpen}
+          onClose={onClose}
+        >
+          <RenderIsAllowedErrors errors={isAllowedResponse?.errors!} />
+        </ModalContainer>
+      )}
     </div>
   );
 }

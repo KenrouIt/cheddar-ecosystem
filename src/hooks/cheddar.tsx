@@ -8,7 +8,7 @@ import { UseQueryResult, useQuery } from '@tanstack/react-query';
 
 // USE IN REACT COMPONENT
 // const { data: cheddarBalanceData, isLoading: isLoadingCheddarBalance, refetch as void=> () } = useGetCheddarBalance();
-export const useGetCheddarBalance = (): UseQueryResult => {
+export const useGetCheddarBalance = (): UseQueryResult<null | bigint> => {
   const { accountId } = useWalletSelector();
 
   return useQuery({
