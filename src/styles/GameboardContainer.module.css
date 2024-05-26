@@ -106,6 +106,6 @@
   overflow-y: scroll;
   max-height: 400px;
 }
-.disableGameBoardContainer {
-  pointer-events: 'none';
+.restartGameButton {
+  font-size: 18px;
 }

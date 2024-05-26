@@ -8,9 +8,6 @@ import React, {
   TouchEvent,
 } from 'react';
 
-import { getSeedId } from '@/queries/api/maze';
-import { useWalletSelector } from './WalletSelectorContext';
-
 interface props {
   children: ReactNode;
 }
@@ -150,42 +147,6 @@ export const GameContextProvider = ({ children }: props) => {
   const [touchEnd, setTouchEnd] = useState({ x: -1, y: -1 });
   const [coveredCells, setCoveredCells] = useState(0);
 
-  const [seedId, setSeedId] = useState(0);
-
-  class RNG {
-    state: number;
-    m: number = 0x80000000;
-    a: number = 1103515245;
-    c: number = 12345;
-
-    constructor(seed: number) {
-      this.state = seed;
-    }
-
-    nextInt() {
-      this.state = (this.a * this.state + this.c) % this.m;
-      return this.state;
-    }
-
-    nextFloat() {
-      return this.nextInt() / (this.m - 1);
-    }
-
-    nextRange(start: number, end: number) {
-      // returns in range [start, end): including start, excluding end
-      // can't modulu nextInt because of weak randomness in lower bits
-      var rangeSize = end - start;
-      var randomUnder1 = this.nextInt() / this.m;
-      return start + Math.floor(randomUnder1 * rangeSize);
-    }
-
-    choice(array: number[]) {
-      return array[this.nextRange(0, array.length)];
-    }
-  }
-
-  const [rng, setRng] = useState(new RNG(0));
-
   // const [backgroundImage, setBackgroundImage] = useState('');
   // const [rarity, setRarity] = useState('');
 
@@ -199,8 +160,6 @@ export const GameContextProvider = ({ children }: props) => {
     setRemainingMinutes(minutes);
     setRemainingSeconds(seconds);
   }, [remainingTime]);
-
-  const { accountId } = useWalletSelector();
 
   // Function to select a random color set, background image, and rarity
   const selectRandomColorSet = () => {
@@ -224,18 +183,11 @@ export const GameContextProvider = ({ children }: props) => {
       });
     });
 
-    return pathCells[rng.nextRange(0, pathCells.length)];
+    return pathCells[Math.floor(Math.random() * pathCells.length)];
   }
 
   // Function to restart the game
-  async function restartGame() {
-    if (!accountId) {
-      return;
-    }
-
-    const newSeedId = await getSeedId(accountId);
-    setSeedId(newSeedId);
-
+  function restartGame() {
     // clearInterval(timerId);
     setScore(0);
     setTimeLimitInSeconds(120);
@@ -250,9 +202,7 @@ export const GameContextProvider = ({ children }: props) => {
     setDirection('right');
 
     // Regenerate maze data
-    setRng(new RNG(newSeedId));
-
-    const newMazeData = generateMazeData(mazeRows, mazeCols, rng);
+    const newMazeData = generateMazeData(mazeRows, mazeCols);
 
     // Set the maze data with the new maze and player's starting position
     setMazeData(newMazeData);
@@ -266,7 +216,7 @@ export const GameContextProvider = ({ children }: props) => {
   }
 
   // Function to generate maze data
-  function generateMazeData(rows: number, cols: number, rng: RNG) {
+  function generateMazeData(rows: number, cols: number) {
     const maze = Array.from({ length: rows }, () =>
       Array.from({ length: cols }, () => ({
         isPath: false,
@@ -281,25 +231,25 @@ export const GameContextProvider = ({ children }: props) => {
     );
 
     // Choose a random starting position on the outer border
-    const startEdge = rng.nextRange(0, 4); // 0: top, 1: right, 2: bottom, 3: left
+    const startEdge = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
     let x: number, y: number;
 
     switch (startEdge) {
       case 0: // Top edge
-        x = rng.nextRange(1, cols - 2);
+        x = Math.floor(Math.random() * (cols - 2)) + 1;
         y = 0;
         break;
       case 1: // Right edge
         x = cols - 1;
-        y = rng.nextRange(1, rows - 2);
+        y = Math.floor(Math.random() * (rows - 2)) + 1;
         break;
       case 2: // Bottom edge
-        x = rng.nextRange(1, cols - 2);
+        x = Math.floor(Math.random() * (cols - 2)) + 1;
         y = rows - 1;
         break;
       case 3: // Left edge
         x = 0;
-        y = rng.nextRange(1, rows - 2);
+        y = Math.floor(Math.random() * (rows - 2)) + 1;
         break;
     }
 
@@ -332,7 +282,7 @@ export const GameContextProvider = ({ children }: props) => {
 
       if (directions.length) {
         const [nx, ny, px, py] =
-          directions[rng.nextRange(0, directions.length)];
+          directions[Math.floor(Math.random() * directions.length)];
         maze[ny][nx].isPath = true;
         maze[py][px].isPath = true;
         stack.push([nx, ny]);
@@ -347,7 +297,7 @@ export const GameContextProvider = ({ children }: props) => {
   // Inside the component where you're using the Maze component
   useEffect(() => {
     // Generate maze data and set it to the state
-    const newMazeData = generateMazeData(mazeRows, mazeCols, new RNG(0));
+    const newMazeData = generateMazeData(mazeRows, mazeCols);
     setMazeData(newMazeData);
 
     const randomColorSet = selectRandomColorSet();
@@ -422,7 +372,7 @@ export const GameContextProvider = ({ children }: props) => {
     // Code for adding enemy artifact...
 
     // Add logic for the enemy defeating the player
-    if (rng.nextFloat() < 0) {
+    if (Math.random() < 0) {
       // 0% chance of the enemy winning
       clonedMazeData[y][x].enemyWon = true;
       clonedMazeData[y][x].isActive = false;
@@ -437,7 +387,7 @@ export const GameContextProvider = ({ children }: props) => {
         () => {
           // setEnemyCooldown(false);
         },
-        rng.nextRange(1000, 6000)
+        Math.floor(Math.random() * 5000) + 1000
       );
     }
   }
@@ -456,7 +406,7 @@ export const GameContextProvider = ({ children }: props) => {
       () => {
         setCheeseCooldown(false);
       },
-      rng.nextRange(1000, 6000)
+      Math.floor(Math.random() * 5000) + 1000
     );
   }
 
@@ -474,7 +424,7 @@ export const GameContextProvider = ({ children }: props) => {
       () => {
         setBagCooldown(false);
       },
-      rng.nextRange(1000, 11000)
+      Math.floor(Math.random() * 10000) + 1000
     );
   }
 
@@ -516,15 +466,15 @@ export const GameContextProvider = ({ children }: props) => {
     }
 
     let clonedMazeData = [...newMazeData];
-    if (!enemyCooldown && rng.nextFloat() < 0.3) {
+    if (!enemyCooldown && Math.random() < 0.3) {
       handleEnemyFound(clonedMazeData, newX, newY);
-    } else if (!cheeseCooldown && rng.nextFloat() < 0.055) {
+    } else if (!cheeseCooldown && Math.random() < 0.055) {
       handleCheeseFound(clonedMazeData, newX, newY);
-    } else if (!bagCooldown && rng.nextFloat() < 0.055) {
+    } else if (!bagCooldown && Math.random() < 0.055) {
       handleBagFound(clonedMazeData, newX, newY);
-    } else if (rng.nextFloat() < 0.002) {
+    } else if (Math.random() < 0.002) {
       handleCartelFound(clonedMazeData, newX, newY);
-    } else if (rng.nextFloat() < 0.33 && coveredCells >= 0.75 * totalCells) {
+    } else if (Math.random() < 0.33 && coveredCells >= 0.75 * totalCells) {
       handleExitFound(clonedMazeData, newX, newY);
     }
     setMazeData(clonedMazeData);

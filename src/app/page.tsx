@@ -3,9 +3,9 @@ import { useContext, useEffect, useState } from 'react';
 import { GameboardContainer } from '../components/GameboardContainer';
 import { GameContext } from '../contexts/GameContextProvider';
 import { useWalletSelector } from '@/contexts/WalletSelectorContext';
-import { ntoy, yton } from '@/contracts/contractUtils';
+import { CheddarToken } from '@/contracts/CheddarToken';
+import { ntoy } from '@/contracts/contractUtils';
 import { useGetCheddarBalance, useGetCheddarMetadata } from '@/hooks/cheddar';
-import { useGetIsAllowedResponse as useGetIsAllowedResponse } from '@/hooks/maze';
 
 export default function Home() {
   const {
@@ -25,38 +25,42 @@ export default function Home() {
   } = useContext(GameContext);
 
   const { selector, accountId } = useWalletSelector();
-
-  const { data: cheddarMetadata, isLoading: isLoadingCheddarMetadata } =
-    useGetCheddarMetadata();
+  const [userCheddarBalance, setUserCheddarBalance] = useState<
+    bigint | undefined | null
+  >();
   const { data: cheddarBalanceData, isLoading: isLoadingCheddarBalance } =
     useGetCheddarBalance();
-  const { data: isAllowedResponse, isLoading: isLoadingIsAllowed } =
-    useGetIsAllowedResponse();
+  const { data: cheddarMetadata, isLoading: isLoadingCheddarMetadata } =
+    useGetCheddarMetadata();
 
-  const [queriesLoaded, setQueriesLoaded] = useState(false);
+  const [cheddarTokenImg, setCheddarTokenImg] = useState<undefined | string>();
 
-  if (!queriesLoaded) {
-    if (
-      !isLoadingCheddarBalance &&
-      !isLoadingCheddarMetadata &&
-      !isLoadingIsAllowed
-    ) {
-      setQueriesLoaded(true);
+  useEffect(() => {
+    async function getCheddarBalance() {
+      const wallet = await selector.wallet();
+      const cheddarTokenContract = new CheddarToken(wallet);
+
+      if (accountId) {
+        const balance = await cheddarTokenContract.getBalance(accountId);
+        setUserCheddarBalance(balance);
+
+        const metadata = await cheddarTokenContract.getMetadata();
+        setCheddarTokenImg(metadata.icon);
+      } else {
+        setUserCheddarBalance(null);
+      }
     }
-  }
+
+    getCheddarBalance();
+  }, [accountId, selector]);
 
   const minCheddarRequired = ntoy(555);
 
   function doesUserHaveEnoughBalance() {
-    if (!cheddarBalanceData) return false;
+    if (!userCheddarBalance) return false;
 
-    return minCheddarRequired <= cheddarBalanceData!;
+    return minCheddarRequired <= userCheddarBalance!;
   }
-
-  let haveEnoughBalance = false;
-  useEffect(() => {
-    haveEnoughBalance = doesUserHaveEnoughBalance();
-  }, [cheddarBalanceData, accountId, selector, isAllowedResponse]);
 
   function handlePowerUpClick() {
     setIsPowerUpOn(!isPowerUpOn);
@@ -99,9 +103,6 @@ export default function Home() {
           remainingSeconds={remainingTime % 60}
           handlePowerUpClick={handlePowerUpClick}
           cellSize={cellSize}
-          haveEnoughBalance={haveEnoughBalance}
-          minCheddarRequired={yton(minCheddarRequired.toString())}
-          isAllowedResponse={isAllowedResponse}
         />
       )}
     </div>
