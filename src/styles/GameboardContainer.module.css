@@ -1,20 +1,16 @@
-.publicityDecoration {
-  position: relative;
-  height: 30px;
-  z-index: 0;
-  width: 100%;
-  background: linear-gradient(180deg, #8542eb, transparent);
-}
-
 .headerContainer {
   display: flex;
   background-color: #8542eb;
   width: 100%;
   justify-content: space-between;
   padding-top: 1rem;
+  padding-bottom: 0.5rem;
+  padding-inline: 0.5rem;
+  align-items: center;
 }
 
 .gameContainer {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,39 +35,53 @@
   padding-left: 1rem;
 }
 
-.headerCheddarIcon {
-  width: 30px;
-}
-
-.litepaperLink {
-  width: 1.4em;
-}
-
-.headerExtension {
+.headerRightPortionContainer {
   display: flex;
+  justify-content: right;
+  min-width: 200px;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.headerCheddarIcon {
+  width: 100px;
+}
+
+.menuList {
+  width: 180px;
+  min-width: unset !important;
+}
+
+.balanceTitle {
+  margin-right: 5px;
 }
 
 .ourSocialMedia {
   position: relative;
   z-index: 4;
 
-  display    : flex;
-  flex-flow  : row;
+  color: white;
+  display: flex;
+  flex-flow: row;
   align-items: center;
-  margin     : 5px 15px 0px 15px;
+  margin: 5px 15px 0px 15px;
 }
 
 .socialMediaLinks {
   color:  #222;
-  margin: 0 0 0 0.1rem;
+  margin: 0 0 0 0.6rem;
   width:  1.5em;
 }
 
 .socialMediaLinks:focus {
   outline-style: none;
-  outline-color: #8542EB;
-  box-shadow   : none;
+  outline-color: #8542eb;
+  box-shadow: none;
   outline-width: 0px;
+}
+
+.balance {
+  margin-right: 5px;
 }
 
 .musicIcon {
@@ -80,17 +90,22 @@
   border-radius: 30px;
   height: 2rem;
   border: 1px solid mediumslateblue;
-  cursor: pointer;
-  margin-right: 1rem;
+  cursor: pointer;;
 }
+.warningText{
+  display: flex;
+  align-items: center;
+  gap:0.2rem;
+}
+
 .notEnoughBalanceMsg {
+  font-size: 18px;
   font-weight: bold;
-  margin: 1rem auto 0.5rem auto;
-  color: #F9BA37 !important;
-  text-shadow: 0px 0px 4px rgba(0, 0, 0, 1);
+  margin-inline: 0.1rem;
+  color: #8542eb !important;
+  text-decoration: underline !important;
 }
 .mazeContainer {
-  margin-bottom: 10px;
   border-radius: 5px;
   overflow: hidden;
   width: fit-content;
@@ -102,20 +117,24 @@
 .debugInfo {
   display: none;
 }
-.gameHeaderContainer {
+.gameName {
   display: flex;
   justify-content: space-around;
   width: 100%;
-  margin: 0 auto;;
+  margin: 0 auto;
 }
 .header {
   font-weight: bolder;
+  margin: 0 auto;
 }
 .userName {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 30%;
+  max-width: 100%;
+}
+.burguerButton {
+  z-index: 10;
 }
 .gameInfo {
   display: flex;
@@ -133,6 +152,8 @@
   display: flex;
   justify-content: space-between;
   background-color: #8542eb;
+  align-items: center;
+  gap:0.5rem;
 }
 .tooltip {
   position: relative;
@@ -178,10 +199,6 @@
 .hideButton {
   z-index: -1;
 }
-.buyPowerUp {
-  flex: 1;
-  text-align: center;
-}
 .buyLink {
   color: yellow;
   text-decoration: none;
@@ -198,7 +215,94 @@
   overflow-y: scroll;
   max-height: 400px;
 }
-.videoContainer {
+.togglePlayModeIconContainer {
+  width: 20px;
+  height: 20px;
+}
+.arrowButtonsContainer {
+  position: absolute;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;  
+  left: 50%;
+  right: 50%;
+  opacity: 0.6;
+}
+.arrowButtonsFirstLine {
   display: flex;
   justify-content: center;
+}
+.arrowButtonsSecondLine {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.logoContainer {
+  display: flex;
+  gap:0.2rem;
+  align-items: center;
+}
+
+.logoText {
+  font-weight: 700;
+}
+
+.textWhite {
+  color:white;
+}
+
+.flexAlignCenter {
+  display: flex;
+  align-items: center;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.textCenter {
+  text-align: center;
+}
+
+.marginLeftSm {
+  margin-left: 0.4rem;
+}
+
+.loginContainer {
+  min-width: 100px;
+}
+
+.publicityDecoration {
+  position: relative;
+  height: 30px;
+  z-index: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #8542eb, transparent);
+}
+
+@media screen and (max-width: 720px) {
+  .publicityDecoration {
+    height: 20px;
+  }
+}
+
+.startGameBg {
+  position: absolute;
+  top: 37%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(34, 34, 34, 0.6); 
+  height: 300px;
+  width: 300px;
+  border: 10px solid rgba(255, 255, 255, 0.8); 
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px; 
 }

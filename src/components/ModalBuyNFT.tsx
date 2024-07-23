@@ -6,16 +6,18 @@ import {
   Image,
   VStack,
   Text,
+  Stack,
+  Switch,
 } from '@chakra-ui/react';
-import { ModalContainer } from './FeedbackModal';
+import { ModalContainer } from './ModalContainer';
 import { useWalletSelector } from '@/contexts/WalletSelectorContext';
-import { RadioButtonBroup } from './RadioButtonGroup';
+import { RadioButtonBroup } from './maze/RadioButtonGroup';
 import { useEffect, useState } from 'react';
-import { RenderCheddarIcon } from './RenderCheddarIcon';
-import { RenderNearIcon } from './RenderNearIcon';
+import { RenderCheddarIcon } from './maze/RenderCheddarIcon';
+import { RenderNearIcon } from './maze/RenderNearIcon';
 import { buyNFT } from '@/contracts/cheddarCalls';
 
-import styles from '../styles/BuyNFTSection.module.css';
+import styles from '@/styles/BuyNFTSection.module.css';
 import { useGetCheddarNFTPrice } from '@/hooks/cheddar';
 import { yton } from '@/contracts/contractUtils';
 import { getTransactionLastResult } from 'near-api-js/lib/providers';
@@ -49,11 +51,13 @@ export const ModalBuyNFT = ({ isOpen, onClose }: Props) => {
         ? 'Loading'
         : yton(cheddarNftPriceInCheddar!),
       icon: <RenderCheddarIcon className={styles.tokenIcon} />,
+      color: 'yellow',
     },
     {
       name: 'Near',
       price: isNftPriceInNearLoading ? 'Loading' : yton(cheddarNftPriceInNear!),
       icon: <RenderNearIcon className={styles.tokenIcon} />,
+      color: 'grey',
     },
   ];
 
@@ -61,6 +65,14 @@ export const ModalBuyNFT = ({ isOpen, onClose }: Props) => {
   const [errorMsg, setErrorMsg] = useState(undefined as undefined | string);
 
   const modalTitle = errorMsg ? 'Something went wrong' : 'Success';
+
+  function handleTogglePayOption() {
+    if (tokenToPayWith === payingOptions[0].name) {
+      setTokenToPayWith(payingOptions[1].name);
+    } else {
+      setTokenToPayWith(payingOptions[0].name);
+    }
+  }
 
   async function handleBuy() {
     try {
@@ -121,20 +133,26 @@ export const ModalBuyNFT = ({ isOpen, onClose }: Props) => {
         <form className={styles.form}>
           <FormControl isRequired>
             <FormLabel>Choose token to pay with:</FormLabel>
-            <RadioButtonBroup
-              options={payingOptions}
-              optionSelected={tokenToPayWith}
-              setOptionSelected={setTokenToPayWith}
-            />
+            <div className={styles.chooseTokenToPayWithContainer}>
+              <span>{payingOptions[0].name}</span>
+              <Switch
+                colorScheme={payingOptions[0].color}
+                className={styles.flip}
+                size="lg"
+                onChange={() => handleTogglePayOption()}
+                isChecked={tokenToPayWith === payingOptions[0].name}
+              />
+              <span>{payingOptions[1].name}</span>
+            </div>
           </FormControl>
 
           <FormLabel>
-            {payingOptions.map((option) => {
+            {payingOptions.map((option, index) => {
               if (option.name === tokenToPayWith) {
                 return (
-                  <>
+                  <div key={index}>
                     {`Cost: ${option.price}`} {option.icon}
-                  </>
+                  </div>
                 );
               }
               return <></>;

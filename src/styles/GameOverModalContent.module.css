@@ -5,17 +5,21 @@
   align-items: center;
 }
 
+.gameOverModal > * {
+  text-align: center;
+}
+
 .gameOver {
   font-size: 1.5rem;
   font-weight: bold;
 }
 
 .win {
-  color: green;
+  color: #7ED957;
 }
 
 .lost {
-  color: red;
+  color: #F1506B;
 }
 
 .score {
@@ -36,4 +40,10 @@
 .loseEarnings {
   font-size: 1.2rem;
   font-weight: bolder;
+}
+.shareContainer {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 20px;
 }

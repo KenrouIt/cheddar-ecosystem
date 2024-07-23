@@ -1,9 +1,9 @@
-import { MazeTileData } from '@/contexts/GameContextProvider';
+import { MazeTileData } from '@/contexts/maze/GameContextProvider';
 import { useContext, useEffect, useRef } from 'react';
-import { GameContext } from '@/contexts/GameContextProvider';
+import { GameContext } from '@/contexts/maze/GameContextProvider';
 import { ListItem, OrderedList } from '@chakra-ui/react';
 
-import styles from '../styles/Gameboard.module.css';
+import styles from '@/styles/Gameboard.module.css';
 import { IsAllowedResponse } from '@/hooks/maze';
 
 interface Props {
@@ -35,26 +35,6 @@ export function Gameboard({
   const touchContainerRef = useRef<HTMLDivElement>(null);
   const gameStartedRef = useRef(false);
 
-  // useEffect(() => {
-  //   const wasGameStarted = gameStartedRef.current
-  //   gameStartedRef.current = timerStarted
-  //   console.log(touchContainerRef.current)
-  //   if(touchContainerRef.current && wasGameStarted !== gameStartedRef.current) {
-  //     console.log("in")
-  //     const tiles = touchContainerRef.current.getElementsByClassName('tile')
-  //     for(let i = 0; i < tiles.length; i++) {
-  //       const tile = tiles[i]
-  //       console.log("Setting up touch event listeners")
-  //       tile.addEventListener('onclick', () => console.log("touchmove"))
-  //       // tile.addEventListener('ontouchmove', handleConditionalFunction(
-  //       //   handleTouchMove,
-  //       //   () => {}
-  //       // ))
-  //       console.log(i, tile)
-  //     }
-  //   }
-  // }, [timerStarted]);
-
   // Check if the game has started for the first time
   const gameStarted = playerPosition !== null;
 
@@ -64,8 +44,8 @@ export function Gameboard({
     (lastCellX !== playerPosition.x || lastCellY !== playerPosition.y);
 
   // Update last player position
-  setLastCellX(playerPosition!.x);
-  setLastCellY(playerPosition!.y);
+  // setLastCellX(playerPosition!.x);
+  // setLastCellY(playerPosition!.y);
 
   function getPlayerImgDirection() {
     return styles[
@@ -165,6 +145,11 @@ export function Gameboard({
             // else if (cell.enemyWon) cellContent = '☠️';
             else if (cell.enemyWon) cellContent = '💀';
             //====================================================== End enemy won logo options ======================================================
+            //====================================================== Start plinko logo options ======================================================
+            // else if(cell.hasPlinko) cellContent = '🎮'
+            // else if(cell.hasPlinko) cellContent = '🕹️'
+            else if (cell.hasPlinko) cellContent = '🎰';
+            //====================================================== End plinko logo options ======================================================
 
             return (
               <div

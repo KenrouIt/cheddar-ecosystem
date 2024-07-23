@@ -1,6 +1,6 @@
 import { Box, HStack, useRadio, useRadioGroup } from '@chakra-ui/react';
 import { isCurrentBrowserSupported } from '@near-wallet-selector/core';
-import styles from '../styles/RadioButtonGroup.module.css';
+import styles from '@/styles/RadioButtonGroup.module.css';
 
 export const RadioCard = (props: any) => {
   const { getInputProps, getRadioProps } = useRadio(props);

@@ -9,6 +9,7 @@ const { cheddarToken, cheddarNft } = getConfig().contracts;
 const tokenViewMethods = {
   ftBalanceOf: 'ft_balance_of',
   ftMetadata: 'ft_metadata',
+  ftTotalSupply: 'ft_total_supply',
 };
 
 const nftViewMethods = {
@@ -20,6 +21,15 @@ export const getCheddarBalance = async (accountId: string): Promise<bigint> => {
   return view(cheddarToken, tokenViewMethods.ftBalanceOf, {
     account_id: accountId,
   }).then(BigInt);
+};
+
+export const getTotalSupply = async (): Promise<bigint> => {
+  return view(cheddarToken, tokenViewMethods.ftTotalSupply)
+    .then(BigInt)
+    .then((a) => {
+      console.log(a);
+      return a;
+    });
 };
 
 export const getCheddarMetadata = async (): Promise<Metadata> => {
@@ -94,12 +104,12 @@ export const buyNFT = async (
 };
 
 export const getCheddarNFTBuyPrice = (
-  accountId: string,
   withCheddar: boolean
 ): Promise<string> => {
   return view(cheddarNft, 'total_cost', {
     num: 1,
-    minter: accountId,
+    // If minter is contract owner, it's free. For every other account, it has the same cost, so it can be hardcoded
+    minter: 'b2a715c29af50e9cc789f92824bb5f76793acc0a12948644a498e8087e029010',
     with_cheddar: withCheddar,
   });
 };

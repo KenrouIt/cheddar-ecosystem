@@ -1,7 +1,7 @@
-import { ModalContainer } from './FeedbackModal';
+import { ModalContainer } from '../ModalContainer';
 import { ListItem, UnorderedList } from '@chakra-ui/react';
 import Link from 'next/link';
-import styles from '../styles/ModalNotAllowedToPlay.module.css';
+import styles from '@/styles/ModalNotAllowedToPlay.module.css';
 
 interface Props {
   errors: string[];

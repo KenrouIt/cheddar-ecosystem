@@ -12,7 +12,7 @@ import { setupHereWallet } from '@near-wallet-selector/here-wallet';
 import { setupMyNearWallet } from '@near-wallet-selector/my-near-wallet';
 import { setupMeteorWallet } from '@near-wallet-selector/meteor-wallet';
 import { setupMintbaseWallet } from '@near-wallet-selector/mintbase-wallet';
-import { store } from '../stores/walletSelector.store';
+import { store } from '@/stores/walletSelector.store';
 import { getConfig } from '@/configs/config';
 
 declare global {
@@ -78,7 +78,13 @@ export const WalletSelectorContextProvider: any = ({ children }: any) => {
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
-      network: NETWORK_ID as NetworkId,
+      network: {
+        networkId: networkData.networkId,
+        nodeUrl: networkData.nodeUrl,
+        helperUrl: networkData.helperUrl,
+        explorerUrl: networkData.explorerUrl,
+        indexerUrl: networkData.indexerUrl,
+      },
       debug: true,
       modules: setupWallets(),
     });

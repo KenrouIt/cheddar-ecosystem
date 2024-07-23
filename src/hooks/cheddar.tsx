@@ -4,11 +4,10 @@ import {
   getCheddarMetadata,
   getCheddarNFTBuyPrice,
   getNFTs,
+  getTotalSupply,
 } from '@/contracts/cheddarCalls';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 
-// USE IN REACT COMPONENT
-// const { data: cheddarBalanceData, isLoading: isLoadingCheddarBalance, refetch as void=> () } = useGetCheddarBalance();
 export const useGetCheddarBalance = (): UseQueryResult<null | bigint> => {
   const { accountId } = useWalletSelector();
 
@@ -20,8 +19,6 @@ export const useGetCheddarBalance = (): UseQueryResult<null | bigint> => {
   });
 };
 
-// USE IN REACT COMPONENT
-// const { data: cheddarMetadata, isLoading: isLoadingCheddarMetadata, refetch as void=> () } = useGetCheddarMetadata();
 export const useGetCheddarMetadata = (): UseQueryResult => {
   return useQuery({
     queryKey: ['useGetCheddarMetadata'],
@@ -31,8 +28,6 @@ export const useGetCheddarMetadata = (): UseQueryResult => {
   });
 };
 
-// USE IN REACT COMPONENT
-// const { data: cheddarNFTsData, isLoading: isLoadingCheddarNFTs, refetch as void=> () } = useGetCheddarNFTs();
 export const useGetCheddarNFTs = (): UseQueryResult => {
   const { accountId } = useWalletSelector();
 
@@ -44,15 +39,21 @@ export const useGetCheddarNFTs = (): UseQueryResult => {
   });
 };
 
+export const useGetCheddarTotalSupply = (): UseQueryResult<bigint> => {
+  return useQuery({
+    queryKey: ['useGetCheddarTotalSupply'],
+    queryFn: () => getTotalSupply(),
+    refetchInterval: 10000,
+    staleTime: 10000,
+  });
+};
+
 export const useGetCheddarNFTPrice = (
   withCheddar: boolean
 ): UseQueryResult<string | null> => {
-  const { accountId } = useWalletSelector();
-
   return useQuery<string | null>({
-    queryKey: ['useGetCheddarNFTs', accountId, withCheddar],
-    queryFn: () =>
-      accountId ? getCheddarNFTBuyPrice(accountId, withCheddar) : null,
+    queryKey: ['useGetCheddarNFTs', withCheddar],
+    queryFn: () => getCheddarNFTBuyPrice(withCheddar),
     refetchInterval: 10000,
     staleTime: 10000,
   });

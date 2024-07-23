@@ -1,11 +1,11 @@
-import { PlayerScoreData } from '@/components/Scoreboard';
+import { PlayerScoreData } from '@/components/maze/Scoreboard';
 import { useWalletSelector } from '@/contexts/WalletSelectorContext';
 import {
   isAllowed as isAllowedResponse,
   getSeedId,
   getPendingCheddarToMint,
   getScoreBoard,
-} from '@/queries/api/maze';
+} from '@/queries/maze/api';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 
 export interface IsAllowedResponse {

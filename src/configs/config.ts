@@ -8,6 +8,7 @@ export interface Config {
     buyCheddarInRefUrl: string;
     nadaBotUrl: string;
     nftImageBaseUrl: string;
+    indexerUrl: string;
   };
   contracts: {
     cheddarNft: string;
@@ -28,10 +29,11 @@ export const getConfig = (): Config => {
       return {
         networkData: {
           networkId: 'mainnet',
-          nodeUrl: 'https://rpc.mainnet.near.org',
+          nodeUrl: 'https://free.rpc.fastnear.com/',
           walletUrl: 'https://wallet.near.org',
           helperUrl: 'https://helper.mainnet.near.org',
           explorerUrl: 'https://explorer.mainnet.near.org',
+          indexerUrl: 'https://api.kitwallet.app',
           buyCheddarInRefUrl:
             'https://app.ref.finance/#near|token.cheddar.near',
           nadaBotUrl: 'https://app.nada.bot/',
@@ -53,8 +55,9 @@ export const getConfig = (): Config => {
       return {
         networkData: {
           networkId: 'testnet',
-          nodeUrl: 'https://rpc.testnet.near.org',
+          nodeUrl: 'https://rpc.testnet.pagoda.co',
           walletUrl: 'https://wallet.testnet.near.org',
+          indexerUrl: 'https://testnet-api.kitwallet.app',
           helperUrl: 'https://helper.testnet.near.org',
           explorerUrl: 'https://explorer.testnet.near.org',
           buyCheddarInRefUrl:
@@ -78,8 +81,9 @@ export const getConfig = (): Config => {
       return {
         networkData: {
           networkId: 'testnet',
-          nodeUrl: 'https://rpc.testnet.near.org',
+          nodeUrl: 'https://rpc.testnet.pagoda.co',
           walletUrl: 'https://wallet.testnet.near.org',
+          indexerUrl: 'https://testnet-api.kitwallet.app',
           helperUrl: 'https://helper.testnet.near.org',
           explorerUrl: 'https://explorer.testnet.near.org',
           buyCheddarInRefUrl:

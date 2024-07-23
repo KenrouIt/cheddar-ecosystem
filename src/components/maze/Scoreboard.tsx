@@ -1,10 +1,12 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import styles from '../styles/Scoreboard.module.css';
+import styles from '@/styles/Scoreboard.module.css';
 import { useWalletSelector } from '@/contexts/WalletSelectorContext';
-import { getScoreBoard } from '@/queries/api/maze';
-import { GameContext } from '@/contexts/GameContextProvider';
+import { getScoreBoard } from '@/queries/maze/api';
+import { GameContext } from '@/contexts/maze/GameContextProvider';
 import { RenderCheddarIcon } from './RenderCheddarIcon';
 import { PlusSquareIcon } from '@chakra-ui/icons';
+import { useGetScoreboard } from '@/hooks/maze';
+import { smartTrim } from '@/utilities/exportableFunctions';
 
 export interface PlayerScoreData {
   accountId: string;
@@ -14,8 +16,10 @@ export interface PlayerScoreData {
 
 export const Scoreboard = () => {
   const { accountId } = useWalletSelector();
-  const { scoreboardResponse } = useContext(GameContext);
   const [rowAmount, setRowAmount] = useState(4);
+
+  const { data: scoreboardResponse, isLoading: isLoadingScoreboard } =
+    useGetScoreboard();
 
   const firstLoggedUserOccurrence = useRef(-1);
 
@@ -67,7 +71,7 @@ export const Scoreboard = () => {
                     className={`${styles.content} ${styles.position}`}
                   >{`${index + 1}`}</td>
                   <td className={`${styles.content} ${styles.userName}`}>
-                    {playerScoreData.accountId}
+                    {smartTrim(playerScoreData.accountId ?? '', 12)}
                   </td>
                   <td className={`${styles.content} ${styles.cheddarEarned}`}>
                     {playerScoreData.cheddarEarned}

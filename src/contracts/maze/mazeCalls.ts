@@ -1,7 +1,7 @@
 import { getConfig } from '@/configs/config';
-import { change, view } from './contractUtils';
+import { change, view } from '../contractUtils';
 import { FinalExecutionOutcome, Wallet } from '@near-wallet-selector/core';
-import { getNearSocial, setNearSocial } from './socialCalls';
+import { getNearSocial, setNearSocial } from '../socialCalls';
 
 const { ecosystem, mazeVersion } = getConfig().socialKeys;
 

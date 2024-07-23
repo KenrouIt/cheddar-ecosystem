@@ -37,9 +37,22 @@
   color: #333333
 }
 
-.backgroundImg2 {
-  background-image: url('https://ipfs.near.social/ipfs/bafkreihpddbzbioe7kctes25rr52klcs5we4pocwiwbmwldqf4acdarpcm');
+html {
+  height: 100%;
+
 }
+
+.backgroundImg {
+  background-image: url('https://ipfs.near.social/ipfs/bafkreihpddbzbioe7kctes25rr52klcs5we4pocwiwbmwldqf4acdarpcm');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  
+}
+/* .backgroundImg2 {
+  background-image: url('https://ipfs.near.social/ipfs/bafkreihpddbzbioe7kctes25rr52klcs5we4pocwiwbmwldqf4acdarpcm');
+} */
 
 .backgroundColorSet3 {
   background-color: #20d3fc;
@@ -159,6 +172,8 @@ body {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,

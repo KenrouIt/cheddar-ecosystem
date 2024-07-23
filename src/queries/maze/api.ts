@@ -1,4 +1,4 @@
-import { PlayerScoreData } from '@/components/Scoreboard';
+import { PlayerScoreData } from '@/components/maze/Scoreboard';
 import { getConfig } from '@/configs/config';
 
 const { backendBaseUrl } = getConfig();

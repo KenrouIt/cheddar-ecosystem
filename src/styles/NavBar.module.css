@@ -1,0 +1,12 @@
+.videoContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.publicityDecoration {
+  position: relative;
+  height: 20px;
+  z-index: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #8542eb, transparent);
+}
